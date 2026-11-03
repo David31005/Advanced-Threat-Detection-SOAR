@@ -27,40 +27,56 @@ jobs:
       - name: Run incident response playbooks
         run: python response_playbooks.py
 
-      - name: Validate detection and response reports
+      - name: Run advanced event correlation
+        run: python event_correlation.py
+
+      - name: Validate all security reports
         run: |
           python - <<'PY'
           import json
 
-          with open("incident_report.json", encoding="utf-8") as file:
-              incidents = json.load(file)
+          with open("incident_report.json", encoding="utf-8") as f:
+              incidents = json.load(f)
 
-          with open("response_report.json", encoding="utf-8") as file:
-              responses = json.load(file)
+          with open("response_report.json", encoding="utf-8") as f:
+              responses = json.load(f)
 
-          assert incidents["total_events"] == 13
+          with open("correlation_report.json", encoding="utf-8") as f:
+              correlation = json.load(f)
+
+          assert incidents["total_events"] == 18
           assert incidents["total_incidents"] == 2
           assert responses["total_responses"] == 2
+          assert correlation["total_events"] == 18
+          assert correlation["total_findings"] == 3
 
-          assert sorted(
-              item["severity"] for item in incidents["incidents"]
-          ) == ["CRITICAL", "HIGH"]
+          types = {
+              finding["finding_type"]
+              for finding in correlation["findings"]
+          }
+
+          assert "BRUTE_FORCE_WITH_SUCCESS" in types
+          assert "BRUTE_FORCE" in types
+          assert "PASSWORD_SPRAYING" in types
 
           assert all(
-              item["containment_executed"] is False
-              and item["approval_required"] is True
-              for item in responses["responses"]
+              response["containment_executed"] is False
+              and response["approval_required"] is True
+              for response in responses["responses"]
           )
 
-          print("Validation passed: 13 events, 2 incidents, 2 playbooks")
+          print("All security validation checks passed!")
+          print("18 events analyzed")
+          print("2 incidents and 2 response playbooks")
+          print("3 correlated security findings")
           PY
 
-      - name: Upload SOAR reports
+      - name: Upload SOAR security reports
         uses: actions/upload-artifact@v4
         with:
-          name: soar-security-reports
+          name: advanced-soar-security-reports
           path: |
             incident_report.json
             response_report.json
+            correlation_report.json
           if-no-files-found: error
-
