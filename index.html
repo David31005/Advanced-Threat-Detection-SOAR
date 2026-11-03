@@ -255,5 +255,133 @@ footer {
   | David Jeffries | Demonstration Data
 </footer>
 
+<section id="interactive-scan" style="max-width:1100px;margin:24px auto;padding:24px;background:#18253a;color:#f1f5fb;border:1px solid #30425c;border-radius:16px;font-family:Arial,sans-serif">
+  <h2>Interactive Security Scan</h2>
+  <p>Analyze simulated authentication events and generate detection alerts.</p>
+  <button id="run-security-scan" type="button" style="background:#2563eb;color:white;border:0;border-radius:8px;padding:14px 20px;font-size:16px">
+    Run Security Scan
+  </button>
+  <p id="scan-status" role="status">Ready to scan.</p>
+  <div id="scan-results" aria-live="polite"></div>
+</section>
+
+<script>
+(() => {
+  const button = document.getElementById("run-security-scan");
+  const status = document.getElementById("scan-status");
+  const results = document.getElementById("scan-results");
+
+  const events = [
+    {second:0, ip:"192.0.2.45", user:"admin", result:"FAILED"},
+    {second:4, ip:"192.0.2.45", user:"admin", result:"FAILED"},
+    {second:8, ip:"192.0.2.45", user:"admin", result:"FAILED"},
+    {second:12, ip:"192.0.2.45", user:"admin", result:"FAILED"},
+    {second:17, ip:"192.0.2.45", user:"admin", result:"SUCCESS"},
+    {second:20, ip:"203.0.113.77", user:"user1", result:"FAILED"},
+    {second:24, ip:"203.0.113.77", user:"user2", result:"FAILED"},
+    {second:28, ip:"203.0.113.77", user:"user3", result:"FAILED"},
+    {second:32, ip:"203.0.113.77", user:"user4", result:"FAILED"},
+    {second:36, ip:"203.0.113.77", user:"user5", result:"FAILED"}
+  ];
+
+  function detectThreats(logs) {
+    const alerts = [];
+    const groups = new Map();
+
+    for (const event of logs) {
+      const key = event.ip + "|" + event.user;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(event);
+    }
+
+    for (const [key, group] of groups) {
+      const failures = group.filter(e => e.result === "FAILED");
+      const successes = group.filter(e => e.result === "SUCCESS");
+      let detected = false;
+
+      for (let i = 0; i <= failures.length - 4; i++) {
+        const window = failures.slice(i, i + 4);
+        if (window[3].second - window[0].second > 60) continue;
+
+        const success = successes.some(e =>
+          e.second > window[3].second &&
+          e.second <= window[3].second + 60
+        );
+
+        alerts.push({
+          name: success ? "Brute Force With Success" : "Brute Force",
+          severity: success ? "CRITICAL" : "HIGH",
+          ip: group[0].ip,
+          mitre: success ? "T1110, T1078" : "T1110",
+          response: success
+            ? "Escalate for analyst review"
+            : "Investigate account activity"
+        });
+        detected = true;
+        break;
+      }
+    }
+
+    const byIp = new Map();
+    for (const event of logs.filter(e => e.result === "FAILED")) {
+      if (!byIp.has(event.ip)) byIp.set(event.ip, []);
+      byIp.get(event.ip).push(event);
+    }
+
+    for (const [ip, group] of byIp) {
+      const sorted = [...group].sort((a,b) => a.second - b.second);
+      for (let i = 0; i <= sorted.length - 5; i++) {
+        const window = sorted.slice(i, i + 5);
+        const users = new Set(window.map(e => e.user));
+        if (users.size >= 5 &&
+            window[4].second - window[0].second <= 60) {
+          alerts.push({
+            name:"Password Spraying",
+            severity:"HIGH",
+            ip,
+            mitre:"T1110.003",
+            response:"Review targeted accounts and MFA"
+          });
+          break;
+        }
+      }
+    }
+
+    return alerts;
+  }
+
+  button.addEventListener("click", () => {
+    const alerts = detectThreats(events);
+    const heading = document.createElement("h3");
+    heading.textContent = "Scan Complete";
+
+    results.replaceChildren(heading);
+    status.textContent =
+      events.length + " simulated events analyzed; " +
+      alerts.length + " alerts detected.";
+
+    for (const alert of alerts) {
+      const card = document.createElement("div");
+      card.style.cssText =
+        "padding:16px;margin:12px 0;background:#223149;border-left:4px solid #fb7185;border-radius:8px";
+
+      for (const [label, value] of Object.entries({
+        Threat:alert.name,
+        Severity:alert.severity,
+        "Source IP":alert.ip,
+        "MITRE ATT&CK":alert.mitre,
+        "Suggested response":alert.response
+      })) {
+        const line = document.createElement("p");
+        line.textContent = label + ": " + value;
+        card.appendChild(line);
+      }
+
+      results.appendChild(card);
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
