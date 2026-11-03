@@ -21,6 +21,9 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Run automated security unit tests
+        run: python -m unittest discover -v
+
       - name: Run threat detection engine
         run: python soar_engine.py
 
@@ -80,3 +83,4 @@ jobs:
             response_report.json
             correlation_report.json
           if-no-files-found: error
+
