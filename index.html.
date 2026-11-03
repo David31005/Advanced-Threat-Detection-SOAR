@@ -1,0 +1,259 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Advanced SOAR | Security Operations Center</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #0b1220;
+  --card: #18253a;
+  --border: #30425c;
+  --text: #f1f5fb;
+  --muted: #a8b8ce;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+}
+header {
+  padding: 30px 20px;
+  background: #111d31;
+  border-bottom: 1px solid var(--border);
+}
+main {
+  max-width: 1100px;
+  margin: auto;
+  padding: 20px;
+}
+h1 { font-size: 27px; margin: 10px 0; }
+h2 { font-size: 20px; margin-top: 0; }
+p { color: var(--muted); line-height: 1.6; }
+.tag {
+  display: inline-block;
+  background: #163e36;
+  color: #7de5b1;
+  padding: 7px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 18px;
+}
+.grid .card { margin-bottom: 0; }
+.metric {
+  font-size: 36px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+.label { color: var(--muted); font-size: 13px; }
+.red { color: #ff7785; }
+.yellow { color: #ffd166; }
+.green { color: #72e3ac; }
+.blue { color: #83b6ff; }
+.threat { margin: 20px 0; }
+.threat-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+.track {
+  background: #30415c;
+  height: 12px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.bar { height: 100%; border-radius: 10px; }
+.alert {
+  padding: 15px;
+  border-left: 4px solid #ff7785;
+  background: #202c42;
+  margin-top: 12px;
+  border-radius: 6px;
+}
+.alert strong { display: block; margin-bottom: 8px; }
+.alert p { margin: 5px 0; font-size: 13px; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+th, td {
+  padding: 12px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+th { color: var(--muted); }
+.table-wrap { overflow-x: auto; }
+footer {
+  padding: 25px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+}
+@media (min-width: 700px) {
+  .grid { grid-template-columns: repeat(4, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="tag">SIMULATED SECURITY LAB</span>
+  <h1>🛡️ Security Operations Center</h1>
+  <p>Advanced Threat Detection & SOAR Automation</p>
+  <p>Cybersecurity Engineering Portfolio | David Jeffries</p>
+</header>
+
+<main>
+  <section class="grid">
+    <div class="card">
+      <div class="label">TOTAL EVENTS</div>
+      <div class="metric blue">18</div>
+    </div>
+    <div class="card">
+      <div class="label">DETECTED INCIDENTS</div>
+      <div class="metric yellow">2</div>
+    </div>
+    <div class="card">
+      <div class="label">CORRELATED FINDINGS</div>
+      <div class="metric red">3</div>
+    </div>
+    <div class="card">
+      <div class="label">AUTOMATED TESTS</div>
+      <div class="metric green">5/5</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Threat Risk Analysis</h2>
+
+    <div class="threat">
+      <div class="threat-top">
+        <span>Brute Force + Successful Login</span>
+        <strong class="red">95 / 100</strong>
+      </div>
+      <div class="track">
+        <div class="bar" style="width:95%;background:#ff7785"></div>
+      </div>
+    </div>
+
+    <div class="threat">
+      <div class="threat-top">
+        <span>Password Spraying</span>
+        <strong class="yellow">85 / 100</strong>
+      </div>
+      <div class="track">
+        <div class="bar" style="width:85%;background:#ffd166"></div>
+      </div>
+    </div>
+
+    <div class="threat">
+      <div class="threat-top">
+        <span>Brute Force</span>
+        <strong class="blue">75 / 100</strong>
+      </div>
+      <div class="track">
+        <div class="bar" style="width:75%;background:#83b6ff"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Threat Detection Alerts</h2>
+
+    <div class="alert">
+      <strong class="red">CRITICAL — Brute Force With Success</strong>
+      <p>Risk Score: 95</p>
+      <p>MITRE ATT&CK: T1110, T1078</p>
+      <p>Action: Investigate successful authentication,
+      review account activity, and consider credential reset.</p>
+    </div>
+
+    <div class="alert">
+      <strong class="yellow">HIGH — Password Spraying</strong>
+      <p>Source IP: 203.0.113.77</p>
+      <p>Targeted Accounts: 5</p>
+      <p>MITRE ATT&CK: T1110.003</p>
+      <p>Action: Review authentication logs,
+      strengthen MFA, and assess source-IP restrictions.</p>
+    </div>
+
+    <div class="alert">
+      <strong class="yellow">HIGH — Brute Force</strong>
+      <p>Risk Score: 75</p>
+      <p>MITRE ATT&CK: T1110</p>
+      <p>Action: Investigate repeated login failures
+      and review account lockout policies.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>SOAR Incident Response</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Threat</th>
+            <th>Severity</th>
+            <th>Response</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Brute Force + Success</td>
+            <td class="red">Critical</td>
+            <td>Escalate for review</td>
+          </tr>
+          <tr>
+            <td>Brute Force</td>
+            <td class="yellow">High</td>
+            <td>Investigate account</td>
+          </tr>
+          <tr>
+            <td>Password Spraying</td>
+            <td class="yellow">High</td>
+            <td>Review targeted accounts</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>All containment actions require human approval.
+    No real accounts or networks are modified.</p>
+  </section>
+
+  <section class="card">
+    <h2>Engineering Capabilities</h2>
+    <p>Python-based detection and correlation</p>
+    <p>Automated incident response playbooks</p>
+    <p>MITRE ATT&CK threat classification</p>
+    <p>GitHub Actions CI/CD automation</p>
+    <p>Five passing automated security tests</p>
+    <p>JSON incident and correlation reporting</p>
+  </section>
+</main>
+
+<footer>
+  Advanced SOAR Cybersecurity Portfolio
+  | David Jeffries | Demonstration Data
+</footer>
+
+</body>
+</html>
