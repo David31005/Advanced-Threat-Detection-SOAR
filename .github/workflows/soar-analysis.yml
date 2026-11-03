@@ -1,0 +1,36 @@
+name: SOAR Threat Detection
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run SOAR detection engine
+        run: python soar_engine.py
+
+      - name: Validate incident report
+        run: |
+          python -c "import json; r=json.load(open('incident_report.json')); assert r['total_events']==13; assert r['total_incidents']==2; assert sorted(i['severity'] for i in r['incidents'])==['CRITICAL','HIGH']; print('Validation passed: 13 events and 2 incidents')"
+
+      - name: Upload incident report
+        uses: actions/upload-artifact@v4
+        with:
+          name: soar-incident-report
+          path: incident_report.json
+          if-no-files-found: error
