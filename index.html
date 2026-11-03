@@ -383,5 +383,139 @@ footer {
 })();
 </script>
 
+<!-- SOC INCIDENT INVESTIGATION PANEL -->
+<section id="soc-investigation" style="max-width:1100px;margin:24px auto;padding:24px;background:#18253a;color:#f1f5fb;border:1px solid #30425c;border-radius:16px;font-family:Arial,sans-serif">
+  <h2>SOC Incident Investigation</h2>
+  <p>Simulated incident triage, analyst notes, and case reporting.</p>
+
+  <label for="soc-case">Select Security Incident</label>
+  <select id="soc-case" style="display:block;width:100%;padding:12px;margin:12px 0;background:#223149;color:white;border:1px solid #64748b;border-radius:8px">
+    <option value="INC-001">INC-001 — Brute Force With Success</option>
+    <option value="INC-002">INC-002 — Password Spraying</option>
+  </select>
+
+  <div id="soc-evidence" style="background:#223149;padding:16px;border-radius:8px;margin:16px 0"></div>
+
+  <label for="soc-status">Investigation Status</label>
+  <select id="soc-status" style="display:block;width:100%;padding:12px;margin:12px 0;background:#223149;color:white;border:1px solid #64748b;border-radius:8px">
+    <option>Open</option>
+    <option>Investigating</option>
+    <option>Escalated</option>
+    <option>Resolved</option>
+  </select>
+
+  <label for="soc-notes">Analyst Notes</label>
+  <textarea id="soc-notes" rows="5" placeholder="Document findings, evidence, and next steps..." style="display:block;width:100%;padding:12px;margin:12px 0;background:#223149;color:white;border:1px solid #64748b;border-radius:8px"></textarea>
+
+  <button id="soc-save" type="button" style="padding:12px;margin:6px;background:#2563eb;color:white;border:0;border-radius:8px">
+    Save Investigation
+  </button>
+
+  <button id="soc-export" type="button" style="padding:12px;margin:6px;background:#059669;color:white;border:0;border-radius:8px">
+    Export JSON Report
+  </button>
+
+  <p id="soc-message" role="status">Select an incident to begin.</p>
+</section>
+
+<script>
+(() => {
+  const cases = {
+    "INC-001": {
+      id: "INC-001",
+      threat: "Brute Force With Success",
+      severity: "CRITICAL",
+      source_ip: "192.0.2.45",
+      mitre_attack: ["T1110", "T1078"],
+      recommended_action: "Escalate for analyst review",
+      status: "Open",
+      notes: ""
+    },
+    "INC-002": {
+      id: "INC-002",
+      threat: "Password Spraying",
+      severity: "HIGH",
+      source_ip: "203.0.113.77",
+      mitre_attack: ["T1110.003"],
+      recommended_action: "Review targeted accounts and MFA",
+      status: "Open",
+      notes: ""
+    }
+  };
+
+  const caseSelect = document.getElementById("soc-case");
+  const evidence = document.getElementById("soc-evidence");
+  const statusSelect = document.getElementById("soc-status");
+  const notesInput = document.getElementById("soc-notes");
+  const message = document.getElementById("soc-message");
+
+  function showCase() {
+    const incident = cases[caseSelect.value];
+    evidence.replaceChildren();
+
+    const fields = {
+      "Incident ID": incident.id,
+      "Threat": incident.threat,
+      "Severity": incident.severity,
+      "Source IP": incident.source_ip,
+      "MITRE ATT&CK": incident.mitre_attack.join(", "),
+      "Recommended action": incident.recommended_action
+    };
+
+    for (const [label, value] of Object.entries(fields)) {
+      const line = document.createElement("p");
+      line.textContent = label + ": " + value;
+      evidence.appendChild(line);
+    }
+
+    statusSelect.value = incident.status;
+    notesInput.value = incident.notes;
+    message.textContent = "Incident loaded.";
+  }
+
+  function saveCase() {
+    const incident = cases[caseSelect.value];
+    incident.status = statusSelect.value;
+    incident.notes = notesInput.value;
+    message.textContent = incident.id + " saved for this browser session.";
+  }
+
+  function exportCase() {
+    saveCase();
+
+    const incident = cases[caseSelect.value];
+    const report = {
+      ...incident,
+      report_type: "SIMULATED_SOC_INCIDENT",
+      exported_at: new Date().toISOString(),
+      disclaimer: "Training simulation only. No real systems modified."
+    };
+
+    const blob = new Blob(
+      [JSON.stringify(report, null, 2)],
+      {type: "application/json"}
+    );
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = incident.id + "-report.json";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    message.textContent = "JSON report export requested.";
+  }
+
+  caseSelect.addEventListener("change", showCase);
+  document.getElementById("soc-save").addEventListener("click", saveCase);
+  document.getElementById("soc-export").addEventListener("click", exportCase);
+
+  showCase();
+})();
+</script>
+<!-- END SOC INCIDENT INVESTIGATION PANEL -->
+
 </body>
 </html>
