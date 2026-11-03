@@ -1,0 +1,16 @@
+{
+  "id": "INC-001",
+  "threat": "Brute Force With Success",
+  "severity": "CRITICAL",
+  "source_ip": "192.0.2.45",
+  "mitre_attack": [
+    "T1110",
+    "T1078"
+  ],
+  "recommended_action": "Escalate for analyst review",
+  "status": "Investigating",
+  "notes": "Investigated simulated brute-force authentication activity from source IP 192.0.2.45. Multiple failed login attempts were followed by a successful authentication. Classified as CRITICAL. MITRE ATT&CK techniques T1110 and T1078. Recommended escalation, account activity review, and credential reset assessment. No real systems affected.",
+  "report_type": "SIMULATED_SOC_INCIDENT",
+  "exported_at": "2026-11-03T20:19:58.290Z",
+  "disclaimer": "Training simulation only. No real systems modified."
+}
