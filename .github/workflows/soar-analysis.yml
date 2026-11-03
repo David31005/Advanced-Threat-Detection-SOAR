@@ -1,4 +1,4 @@
-name: SOAR Threat Detection
+name: SOAR Threat Detection and Response
 
 on:
   push:
@@ -21,16 +21,46 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Run SOAR detection engine
+      - name: Run threat detection engine
         run: python soar_engine.py
 
-      - name: Validate incident report
-        run: |
-          python -c "import json; r=json.load(open('incident_report.json')); assert r['total_events']==13; assert r['total_incidents']==2; assert sorted(i['severity'] for i in r['incidents'])==['CRITICAL','HIGH']; print('Validation passed: 13 events and 2 incidents')"
+      - name: Run incident response playbooks
+        run: python response_playbooks.py
 
-      - name: Upload incident report
+      - name: Validate detection and response reports
+        run: |
+          python - <<'PY'
+          import json
+
+          with open("incident_report.json", encoding="utf-8") as file:
+              incidents = json.load(file)
+
+          with open("response_report.json", encoding="utf-8") as file:
+              responses = json.load(file)
+
+          assert incidents["total_events"] == 13
+          assert incidents["total_incidents"] == 2
+          assert responses["total_responses"] == 2
+
+          assert sorted(
+              item["severity"] for item in incidents["incidents"]
+          ) == ["CRITICAL", "HIGH"]
+
+          assert all(
+              item["containment_executed"] is False
+              and item["approval_required"] is True
+              for item in responses["responses"]
+          )
+
+          print("Validation passed: 13 events, 2 incidents, 2 playbooks")
+          PY
+
+      - name: Upload SOAR reports
         uses: actions/upload-artifact@v4
         with:
-          name: soar-incident-report
-          path: incident_report.json
+          name: soar-security-reports
+          path: |
+            incident_report.json
+            response_report.json
           if-no-files-found: error
+
